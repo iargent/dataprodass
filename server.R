@@ -1,25 +1,17 @@
 library(shiny)
+
+# Load the data on school usage and teacher logins
+# into a dataframe, "schools".
 load("./Data/schools.RData")
+
+# Calculate a linear model for predicting "hours" from "logins"
 fit<-lm(hours ~ logins, data=schools)
 
-# Define server logic required to draw a histogram
 shinyServer(function(input, output) {
         
-        # Expression that generates a histogram. The expression is
-        # wrapped in a call to renderPlot to indicate that:
-        #
-        #  1) It is "reactive" and therefore should re-execute automatically
-        #     when inputs change
-        #  2) Its output type is a plot
-        
-        output$distPlot <- renderPlot({
-                x    <- faithful[, 2]  # Old Faithful Geyser data
-                bins <- seq(min(x), max(x), length.out = input$bins + 1)
-                
-                # draw the histogram with the specified number of bins
-                hist(x, breaks = bins, col = 'skyblue', border = 'white')
-        })
-        
+        # plot hours against logins
+        # show linear model with red line
+        # show slider estimate and prediction with blue lines
         output$usagePlot <- renderPlot({
                 x<-schools$logins
                 y<-schools$hours
@@ -28,14 +20,15 @@ shinyServer(function(input, output) {
                 plot(
                         schools$logins,
                         schools$hours,
-                        xlab = "usage (hours)",
-                        ylab = "number of teacher logins"
+                        xlab = "number of teacher logins",
+                        ylab = "usage (hours)"
                         )
                 abline(fit, col="red")
                 abline(v=input$tlogins, col="blue")
                 abline(h=predict(fit, new.school), col="blue")
                 
-                output$estimate<-renderText(
+        # Show the user what slider value they selected
+        output$estimate<-renderText(
                         paste(
                                 "You chose an estimate of",
                                 input$tlogins,
@@ -43,7 +36,9 @@ shinyServer(function(input, output) {
                         )
                               
                 )
-                output$result<-renderText(
+        
+        # Show the user the corresponding estimate of hours of usage
+        output$result<-renderText(
                         paste(
                                 "The estimated usage would be",
                                 round(predict(fit, new.school)),
