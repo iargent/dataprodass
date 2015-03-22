@@ -34,5 +34,21 @@ shinyServer(function(input, output) {
                 abline(fit, col="red")
                 abline(v=input$tlogins, col="blue")
                 abline(h=predict(fit, new.school), col="blue")
+                
+                output$estimate<-renderText(
+                        paste(
+                                "You chose an estimate of",
+                                input$tlogins,
+                                "teacher logins."
+                        )
+                              
+                )
+                output$result<-renderText(
+                        paste(
+                                "The estimated usage would be",
+                                round(predict(fit, new.school)),
+                                "."
+                        )
+                )
         })
 })
